@@ -1,0 +1,27 @@
+= Memory Pool Library
+
+== Overview
+
+The Memory Pool Library provides a lightweight and efficient memory management system designed for Arduino and other resource-constrained embedded systems. It allows dynamic memory allocation and deallocation with fixed-size memory segments, reducing fragmentation and improving performance in environments with limited RAM.
+
+== Features
+
+- Dynamic memory allocation with fixed-size segments
+- Support for multiple segment sizes
+- Efficient bit-mapped allocation tracking
+- Debug features for allocation statistics
+- Template-based allocation for type-safe memory management
+
+== Installation
+
+1. Download the library as a ZIP file from the repository.
+2. In the Arduino IDE, go to `Sketch > Include Library > Add .ZIP Library` and select the downloaded file.
+3. The library is now available for use in your sketches.
+
+== Usage
+
+See the `examples` folder for sample sketches demonstrating how to use the library. A basic example is provided in `examples/mempool_example/mempool_example.ino`.
+
+== License
+
+This library is licensed under the MIT License. See the `LICENSE` file for details.

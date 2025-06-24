@@ -1,0 +1,23 @@
+# Syntax highlighting for Memory Pool Library
+
+#######################################
+# Classes
+#######################################
+mempool	KEYWORD1
+segment	KEYWORD1
+
+#######################################
+# Methods and Functions
+#######################################
+begin	KEYWORD2
+alloc	KEYWORD2
+release	KEYWORD2
+print_buffer	KEYWORD2
+print_segment_lookup	KEYWORD2
+print_stats	KEYWORD2
+
+#######################################
+# Constants
+#######################################
+SEGMENT_STEP	LITERAL1
+SEGMENT_LOG2	LITERAL1
