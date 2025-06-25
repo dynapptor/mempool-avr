@@ -12,9 +12,9 @@ A structure to define a memory segment.
 
 - **Fields**:
   - `uint16_t count`: Number of cells in the segment.
-  - `uint8_t size`: Size of each cell in bytes.
+  - `uint8_t size`: Size of each cell in bytes / 4.
 - **Constructor**:
-  - `segment(uint16_t c, uint16_t s)`: Initializes a segment with `c` cells of size `s`.
+  - `segment(uint16_t c, uint16_t s)`: Initializes a segment with `c` cells of size `s` x 4.
 
 ### `mempool`
 

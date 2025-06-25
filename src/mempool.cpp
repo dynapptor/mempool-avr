@@ -4,13 +4,21 @@
 
 mempool::mempool() {}
 mempool::~mempool() {
-  delete[] _segment_sizes;
-  delete[] _cell_count;
-  delete[] _magic_number;
-  delete[] _segment_shift;
-  delete[] _buffer;
-  delete[] _segment_lookup;
-  delete[] _segment_ptr;
+  clean();
+}
+
+void mempool::clean() {
+  if (_segment_sizes) delete[] _segment_sizes;
+  if (_cell_count) delete[] _cell_count;
+  if (_magic_number) delete[] _magic_number;
+  if (_segment_shift) delete[] _segment_shift;
+  if (_buffer) delete[] _buffer;
+  if (_segment_lookup) delete[] _segment_lookup;
+  if (_segment_ptr) delete[] _segment_ptr;
+#ifdef MEMPOOL_DEBUG
+  if (_max_cells_used) delete[] _max_cells_used;
+  if (_allocs_per_segment) delete[] _allocs_per_segment;
+#endif
 }
 
 const uint8_t first_zero_bit_lut[256] PROGMEM = {
@@ -31,17 +39,37 @@ bool mempool::begin(segment* segs, uint8_t count) {
   if (_initialized) return false;
   if (count > 32) return false;
   _segment_sizes = new uint16_t[count];
-  _cell_count = new uint8_t[count];
-  _magic_number = new uint32_t[count];
-  _segment_shift = new uint8_t[count]{};
-  // #ifdef MEMPOOL_DEBUG
-  _max_cells_used = new uint8_t[count];
-  _allocs_per_segment = new uint32_t[count];
-  for (uint8_t i = 0; i < count; i++) {
-    _max_cells_used[i] = 0;
-    _allocs_per_segment[i] = 0;
+  if (!_segment_sizes) {
+    clean();
+    return false;
   }
-  // #endif
+  _cell_count = new uint8_t[count];
+  if (!_cell_count) {
+    clean();
+    return false;
+  }
+  _magic_number = new uint32_t[count];
+  if (!_magic_number) {
+    clean();
+    return false;
+  }
+  _segment_shift = new uint8_t[count]{};
+  if (!_segment_shift) {
+    clean();
+    return false;
+  }
+#ifdef MEMPOOL_DEBUG
+  _max_cells_used = new uint8_t[count]{};
+  if (!_max_cells_used) {
+    clean();
+    return false;
+  }
+  _allocs_per_segment = new uint32_t[count]{};
+  if (!_allocs_per_segment) {
+    clean();
+    return false;
+  }
+#endif
   _initialized = true;
   _segment_count = count;
   _buffer_size = 0;
@@ -49,11 +77,17 @@ bool mempool::begin(segment* segs, uint8_t count) {
   uint8_t ix;
   uint16_t currentSize = 0;
   for (uint8_t i = 0; i < count; ++i) {
-    if (segs[i].size == 0) return false;
+    if (segs[i].size == 0) {
+      clean();
+      return false;
+    }
     ix = _get_next_segment(segs, count, currentSize);
 
     _segment_sizes[i] = segs[ix].size * SEGMENT_STEP;
-    if (_segment_sizes[i] > 64) return false;
+    if (_segment_sizes[i] > 64) {
+      clean();
+      return false;
+    }
     _cell_count[i] = segs[ix].count;
 
     currentSize = segs[ix].size;
@@ -65,8 +99,16 @@ bool mempool::begin(segment* segs, uint8_t count) {
   _max_segment_size = _segment_sizes[count - 1];
 
   _buffer = new uint8_t[_buffer_size]{};
+  if (!_buffer) {
+    clean();
+    return false;
+  }
   _segment_lookup_count = (_max_segment_size / SEGMENT_STEP);
   _segment_lookup = new int8_t[_segment_lookup_count];
+  if (!_segment_lookup) {
+    clean();
+    return false;
+  }
 
   for (uint8_t i = 1; i <= _segment_lookup_count; i++) {
     _segment_lookup[i - 1] = _lookup_segment(i * SEGMENT_STEP);
@@ -74,6 +116,10 @@ bool mempool::begin(segment* segs, uint8_t count) {
 
   uint8_t* p = _buffer;
   _segment_ptr = new uint8_t*[count];
+  if (!_segment_ptr) {
+    clean();
+    return false;
+  }
 
   for (uint8_t i = 0; i < count; ++i) {
     p += (_cell_count[i] + 7) / 8;
@@ -229,6 +275,8 @@ void mempool::release(uint8_t* ptr) {
 }
 
 void mempool::print_stats() {
+  if (!Serial) return;
+#ifdef MEMPOOL_DEBUG
   Serial.print("Total allocs: ");
   Serial.println(_total_allocs);
   Serial.print("Failed allocs: ");
@@ -241,6 +289,9 @@ void mempool::print_stats() {
     Serial.print(", allocs = ");
     Serial.println(_allocs_per_segment[i]);
   }
+#else
+  Serial.println("Debug stats not available. Enable MEMPOOL_DEBUG to see statistics.");
+#endif
 }
 
 /*

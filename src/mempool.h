@@ -35,6 +35,11 @@ class mempool {
   ~mempool();
 
   /**
+   * @brief Frees all dynamically allocated memory and resets the pool.
+   */
+  void clean();
+
+  /**
    * @brief Initializes the memory pool with given segments.
    * @param segs Array of segments to initialize the pool.
    * @param count Number of segments.

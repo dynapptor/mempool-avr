@@ -3,9 +3,9 @@
 
 mempool pool;
 segment segments[] = {
-    segment(10, 8),  // 10 cells of 8 bytes
-    segment(5, 16),  // 5 cells of 16 bytes
-    segment(3, 32)   // 3 cells of 32 bytes
+    segment(10, 2),  // 10 cells of 8 bytes
+    segment(5, 4),   // 5 cells of 16 bytes
+    segment(3, 8)    // 3 cells of 32 bytes
 };
 
 void setup() {
