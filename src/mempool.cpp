@@ -294,6 +294,8 @@ void mempool::print_stats() {
 #endif
 }
 
+mempool mem;
+
 /*
 
 uint8_t* mempool::alloc(uint16_t size) {

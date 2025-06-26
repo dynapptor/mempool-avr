@@ -148,3 +148,5 @@ class mempool {
 };
 
 #include "mempool.tpp"
+
+extern mempool mem;
