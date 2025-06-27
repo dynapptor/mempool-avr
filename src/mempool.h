@@ -2,8 +2,7 @@
 #pragma once
 #include <stdint.h>
 
-#define SEGMENT_STEP 4  ///< Step size for segment allocation
-#define SEGMENT_LOG2 2  ///< Log2 of segment step for size calculations
+#define MAX_SEGMENT_SIZE 256
 
 /**
  * @brief Structure to define a memory segment with count and size.
@@ -91,6 +90,11 @@ class mempool {
    */
   template <typename T>
   void release(T* ptr);
+
+  /**
+   * @brief Return the biggest sigment size.
+   */
+  uint16_t max_segment_size();
 
  private:
   bool _initialized = false;         ///< Flag indicating if the pool is initialized

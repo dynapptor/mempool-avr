@@ -2,6 +2,9 @@
 
 #include <Arduino.h>
 
+#define SEGMENT_STEP 4  ///< Step size for segment allocation
+#define SEGMENT_LOG2 2  ///< Log2 of segment step for size calculations
+
 mempool::mempool() {}
 mempool::~mempool() {
   clean();
@@ -84,7 +87,7 @@ bool mempool::begin(segment* segs, uint8_t count) {
     ix = _get_next_segment(segs, count, currentSize);
 
     _segment_sizes[i] = segs[ix].size * SEGMENT_STEP;
-    if (_segment_sizes[i] > 64) {
+    if (_segment_sizes[i] > MAX_SEGMENT_SIZE) {
       clean();
       return false;
     }
@@ -293,6 +296,8 @@ void mempool::print_stats() {
   Serial.println("Debug stats not available. Enable MEMPOOL_DEBUG to see statistics.");
 #endif
 }
+
+uint16_t mempool::max_segment_size() { return _max_segment_size; }
 
 mempool mem;
 
