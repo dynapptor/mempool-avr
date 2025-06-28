@@ -18,7 +18,7 @@ void mempool::clean() {
   if (_buffer) delete[] _buffer;
   if (_segment_lookup) delete[] _segment_lookup;
   if (_segment_ptr) delete[] _segment_ptr;
-#ifdef MEMPOOL_DEBUG
+#ifdef MEMPOOL_STATISTIC
   if (_max_cells_used) delete[] _max_cells_used;
   if (_allocs_per_segment) delete[] _allocs_per_segment;
 #endif
@@ -61,7 +61,7 @@ bool mempool::begin(segment* segs, uint8_t count) {
     clean();
     return false;
   }
-#ifdef MEMPOOL_DEBUG
+#ifdef MEMPOOL_STATISTIC
   _max_cells_used = new uint8_t[count]{};
   if (!_max_cells_used) {
     clean();
@@ -192,7 +192,7 @@ void mempool::print_segment_lookup(uint8_t f) {
 
 uint8_t* mempool::alloc(uint16_t size) {
   if (size > _max_segment_size) {
-#ifdef MEMPOOL_DEBUG
+#ifdef MEMPOOL_STATISTIC
     _failed_allocs++;
 #endif
     return nullptr;
@@ -201,7 +201,7 @@ uint8_t* mempool::alloc(uint16_t size) {
   uint8_t* base = _segment_ptr[sg];
   if (base[-1] == 0xFF) {
     if (sg < _segment_count - 1) return alloc(_segment_sizes[sg + 1]);
-#ifdef MEMPOOL_DEBUG
+#ifdef MEMPOOL_STATISTIC
     _failed_allocs++;
 #endif
     return nullptr;
@@ -212,7 +212,7 @@ uint8_t* mempool::alloc(uint16_t size) {
   bitSet(*cellBase, cellIndex);
   if (*cellBase == 0xFF) bitSet(*(base - 1), poolIndex);
 
-#ifdef MEMPOOL_DEBUG
+#ifdef MEMPOOL_STATISTIC
   _total_allocs++;
   _allocs_per_segment[sg]++;
   uint8_t used_cells = 0;
@@ -279,7 +279,7 @@ void mempool::release(uint8_t* ptr) {
 
 void mempool::print_stats() {
   if (!Serial) return;
-#ifdef MEMPOOL_DEBUG
+#ifdef MEMPOOL_STATISTIC
   Serial.print("Total allocs: ");
   Serial.println(_total_allocs);
   Serial.print("Failed allocs: ");
@@ -293,7 +293,7 @@ void mempool::print_stats() {
     Serial.println(_allocs_per_segment[i]);
   }
 #else
-  Serial.println("Debug stats not available. Enable MEMPOOL_DEBUG to see statistics.");
+  Serial.println("Debug stats not available. Enable MEMPOOL_STATISTIC to see statistics.");
 #endif
 }
 
