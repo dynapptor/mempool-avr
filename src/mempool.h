@@ -144,11 +144,12 @@ class mempool {
    * @return Prepared bit mask.
    */
   uint8_t _prepareMask(uint8_t c);
-
+#ifdef MEMPOOL_STATISTIC
   uint8_t* _max_cells_used = nullptr;       ///< Maximum cells used per segment
   uint32_t _total_allocs = 0;               ///< Total number of allocations
   uint32_t _failed_allocs = 0;              ///< Number of failed allocations
   uint32_t* _allocs_per_segment = nullptr;  ///< Allocations per segment
+#endif
 };
 
 #include "mempool.tpp"
